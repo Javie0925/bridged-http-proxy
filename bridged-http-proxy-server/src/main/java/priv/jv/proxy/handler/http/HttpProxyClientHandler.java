@@ -55,6 +55,7 @@ public class HttpProxyClientHandler extends ChannelInboundHandlerAdapter {
         ByteBuf in = (ByteBuf) msg;
         if (isRouteClientConnection(in)) {
             routeChannel = ctx.channel();
+            clientChannel.config().setAutoRead(true);
             log.info("Route client is ready. remote address:{}", routeChannel.remoteAddress());
             return;
         }

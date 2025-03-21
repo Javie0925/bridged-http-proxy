@@ -1,5 +1,6 @@
 package priv.jv.proxy.handler.http;
 
+import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFutureListener;
@@ -30,8 +31,9 @@ class HttpProxyRemoteHandler extends ChannelInboundHandlerAdapter {
 
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) {
-        serverChannel.write(msg); // just forward
-        serverChannel.writeAndFlush(uuid.getBytes()); // write uuid
+        ByteBuf byteBuf = (ByteBuf) msg;
+        byteBuf.writeBytes(uuid.getBytes());
+        serverChannel.writeAndFlush(byteBuf); // just forward
     }
 
     @Override

@@ -2,6 +2,8 @@ package priv.jv.proxy;
 
 
 import io.netty.bootstrap.Bootstrap;
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
@@ -17,6 +19,7 @@ import org.springframework.boot.autoconfigure.jmx.JmxAutoConfiguration;
 import org.springframework.context.ApplicationContext;
 import priv.jv.proxy.constant.CommonConstants;
 import priv.jv.proxy.handler.http.HttpProxyClientHandler;
+import priv.jv.proxy.handler.http.ServerInitiationHandler;
 
 import java.text.MessageFormat;
 
@@ -62,13 +65,14 @@ public class NettyClientApplication implements CommandLineRunner {
         Bootstrap bootstrap = new Bootstrap()
                 .group(group)
                 .channel(NioSocketChannel.class)
-                //.handler(new ServerInitiationHandler())
+                .handler(new ServerInitiationHandler())
                 .handler(new HttpProxyClientHandler());
         ChannelFuture channelFuture = bootstrap.connect(host, port).sync();
         serverChannel = channelFuture.channel();
         channelFuture.addListener((ChannelFutureListener) future -> {
             if (future.isSuccess()) {
-                serverChannel.writeAndFlush(CommonConstants.ROUTE_CLIENT_FLAG.getBytes()); // send flag
+                ByteBuf byteBuf = Unpooled.copiedBuffer(CommonConstants.ROUTE_CLIENT_FLAG.getBytes());
+                serverChannel.writeAndFlush(byteBuf); // send flag
             } else {
                 serverChannel.close();
                 log.error("connect to server fail.");
