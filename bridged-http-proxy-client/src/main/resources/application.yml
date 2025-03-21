@@ -1,0 +1,4 @@
+netty:
+  server:
+    host: 192.168
+    port: 9876

@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<configuration debug="false">
+    <property name="filters"
+              value="full,$Proxy,javax.crypto.Cipher,com.sun.,sun.reflect.,java.lang.reflect.,java.io.,java.net.,org.eclipse.jetty.,org.apache.cxf.,org.springframework.beans.,org.springframework.context.,org.apache.commons.httpclient.,org.apache.commons.pool.,org.apache.http.,io.netty.,org.junit.,org.apache.maven.,org.springframework.amqp.rabbit."/>
+    <property name="layout"
+              value="[%d{yyyy-MM-dd HH:mm:ss.SSS}] %level [%thread] %logger{10} [%X{PtxId}, %X{PspanId}] - %msg%n%xEx{${filters}}"/>
+    <property name="maxHistory" value="2"/>
+    <property name="maxFileSize" value="30MB"/>
+    <property name="queueSize" value="1024"/>
+    <property name="totalSizeCap" value="2GB"/>
+    <appender name="consoleAppender" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder class="ch.qos.logback.core.encoder.LayoutWrappingEncoder">
+            <charset>UTF-8</charset>
+            <layout class="ch.qos.logback.classic.PatternLayout">
+                <Pattern>${layout}</Pattern>
+            </layout>
+        </encoder>
+    </appender>
+
+    <appender name="toLogFile" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <File>logs/server.log</File>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>logs/server.log.%d{yyyy-MM-dd}.%i</fileNamePattern>
+            <maxHistory>${maxHistory}</maxHistory>
+            <totalSizeCap>${totalSizeCap}</totalSizeCap>
+            <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+                <maxFileSize>${maxFileSize}</maxFileSize>
+            </timeBasedFileNamingAndTriggeringPolicy>
+        </rollingPolicy>
+        <encoder class="ch.qos.logback.core.encoder.LayoutWrappingEncoder">
+            <charset>UTF-8</charset>
+            <layout class="ch.qos.logback.classic.PatternLayout">
+                <Pattern>${layout}</Pattern>
+            </layout>
+        </encoder>
+    </appender>
+    <appender name="toLogFileAsync" class="ch.qos.logback.classic.AsyncAppender">
+        <discardingThreshold>0</discardingThreshold>
+        <queueSize>${queueSize}</queueSize>
+        <appender-ref ref="toLogFile"/>
+    </appender>
+
+    <root level="INFO">
+        <appender-ref ref="consoleAppender"/>
+        <appender-ref ref="toLogFile"/>
+    </root>
+
+</configuration>
